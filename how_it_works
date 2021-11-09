@@ -1,0 +1,3 @@
+- client tells server it exists over tcp socket
+- server keeps a record of that
+- when server wants to start, it tells all the clients to start with a time delta. time delta affected by when msg was sent
