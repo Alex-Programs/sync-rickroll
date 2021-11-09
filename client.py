@@ -10,19 +10,27 @@ PORT = int(input("Port: "))
 
 BUFFERSIZE = 4096
 
+soundobjs = []
+
 obj = sa.WaveObject.from_wave_file("starman.wav")
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
     while True:
-        resp = s.recv(BUFFERSIZE).decode("utf8").split(":")[1]
+        while True:
+            signal, data = s.recv(BUFFERSIZE).decode("utf8").split(":")
 
-        if resp:
-            break
+            if signal == "START":
+                break
+            elif signal == "KILL":
+                for obj in soundobjs:
+                    obj.stop()
+            else:
+                print(signal, data)
 
-    print("Start in " + str(resp))
+        print("Start in " + str(data))
 
-    time.sleep(float(resp))
+        time.sleep(float(data))
 
-    obj = obj.play()
-    obj.wait_done()
+        print("Starting")
+        soundobjs.append(obj.play())

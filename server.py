@@ -15,12 +15,13 @@ def handle_conn(conn, addr):
     print("[+] Connection from: {}".format(addr))
     shared.clients.append(conn)
 
+
 def start():
     startDelta = 2
     startTime = time.time()
     for client in shared.clients:
         try:
-            data = ("DATA:" + str(startDelta - (time.time() - startTime)) + ":END DATA").encode("utf8")
+            data = ("START:" + str(startDelta - (time.time() - startTime))).encode("utf8")
             print(str(data))
             client.send(data)
         except Exception as e:
@@ -33,10 +34,24 @@ def start():
             break
 
 
+def kill():
+    for client in shared.clients:
+        try:
+            data = ("KILL:JUST DIE").encode("utf8")
+            print(str(data))
+            client.send(data)
+        except Exception as e:
+            print(e)
+
+
 def listen_to_start():
     while True:
-        input("")
-        start()
+        data = input("")
+        if data == "start":
+            start()
+
+        elif data == "kill":
+            kill()
 
 
 Thread(target=listen_to_start).start()
