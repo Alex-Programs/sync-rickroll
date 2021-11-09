@@ -1,11 +1,7 @@
 import socket
 import time
 from threading import *
-
-HOST = "0.0.0.0"
-PORT = 1085
-BUFFERSIZE = 4096
-
+import argparse
 
 class shared():
     clients = []
@@ -53,21 +49,37 @@ def listen_to_start():
         elif data == "kill":
             kill()
 
+def main():
+    parser = argparse.ArgumentParser(description="Synchronised rickrolls!")
 
-Thread(target=listen_to_start).start()
+    parser.add_argument("host", type=str, default="0.0.0.0", help="Host")
+    parser.add_argument("port", type=int, default=1085, help="Port")
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    while True:
-        try:
-            s.bind((HOST, PORT))
-            print("Bound at " + str(PORT))
-            break
-        except:
-            PORT += 1
+    args = vars(parser.parse_args())
 
-    while True:
-        s.listen()
+    HOST = args["host"]
+    PORT = args["port"]
 
-        conn, addr = s.accept()
+    BUFFERSIZE = 4096
 
-        Thread(target=handle_conn, args=(conn, addr)).start()
+    args = vars(parser.parse_args())
+
+    Thread(target=listen_to_start).start()
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        while True:
+            try:
+                s.bind((HOST, PORT))
+                print("Bound at " + str(PORT))
+                break
+            except:
+                PORT += 1
+
+        while True:
+            s.listen()
+
+            conn, addr = s.accept()
+
+            Thread(target=handle_conn, args=(conn, addr)).start()
+
+main()
